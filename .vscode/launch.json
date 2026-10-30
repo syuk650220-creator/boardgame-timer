@@ -1,0 +1,16 @@
+{
+  // F5 キーで「iPhoneで開く」を実行できます
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "iPhoneで開く（サーバー起動）",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/tools/serve.js",
+      "args": ["--open"],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "skipFiles": ["<node_internals>/**"]
+    }
+  ]
+}

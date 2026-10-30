@@ -1,0 +1,34 @@
+{
+  // メニューの［ターミナル］→［タスクの実行...］から選べます
+  // （Ctrl + Shift + B でサーバー起動）
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "iPhoneで開く（サーバー起動）",
+      "type": "shell",
+      "command": "node",
+      "args": ["tools/serve.js", "--open"],
+      "isBackground": true,
+      "problemMatcher": [],
+      "group": { "kind": "build", "isDefault": true },
+      "presentation": { "reveal": "always", "panel": "dedicated", "focus": true, "clear": true }
+    },
+    {
+      "label": "タイマーのテストを実行",
+      "type": "shell",
+      "command": "node",
+      "args": ["--test", "tools/test-timer.js"],
+      "problemMatcher": [],
+      "group": { "kind": "test", "isDefault": true },
+      "presentation": { "reveal": "always", "panel": "shared", "clear": true }
+    },
+    {
+      "label": "アイコン画像を作り直す",
+      "type": "shell",
+      "command": "node",
+      "args": ["tools/make-icons.js"],
+      "problemMatcher": [],
+      "presentation": { "reveal": "always", "panel": "shared", "clear": true }
+    }
+  ]
+}

@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#1c2738"/>
+      <stop offset="1" stop-color="#0a0e13"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="512" cy="560" r="430" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#35d6b8" stop-opacity="0.22"/>
+      <stop offset="1" stop-color="#35d6b8" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="arc" x1="820" y1="230" x2="240" y2="860" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#74f6de"/>
+      <stop offset="1" stop-color="#1db293"/>
+    </linearGradient>
+    <linearGradient id="meeple" x1="0" y1="0" x2="0" y2="100" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ffd877"/>
+      <stop offset="1" stop-color="#ffa62b"/>
+    </linearGradient>
+  </defs>
+  <rect width="1024" height="1024" fill="url(#bg)"/>
+  <g id="fg">
+    <circle cx="512" cy="560" r="430" fill="url(#glow)"/>
+    <!-- ストップウォッチのボタン -->
+    <rect x="484" y="150" width="56" height="64" rx="12" fill="#aebbc9"/>
+    <rect x="430" y="100" width="164" height="60" rx="24" fill="#e2e8ef"/>
+    <!-- 残り時間のリング -->
+    <circle cx="512" cy="560" r="330" fill="none" stroke="#ffffff" stroke-opacity="0.11" stroke-width="72"/>
+    <path d="M512 230A330 330 0 1 1 226.2 395" fill="none" stroke="url(#arc)" stroke-width="72" stroke-linecap="round"/>
+    <circle cx="226.2" cy="395" r="21" fill="#ffffff"/>
+    <!-- ミープル（ボードゲームのコマ） -->
+    <g transform="translate(319.5 382) scale(3.85)" fill="url(#meeple)">
+      <circle cx="50" cy="16" r="14.5"/>
+      <path d="M50 27C60 27 80 30 91 36C100 41 100 53 90 56C82 58.5 73 58 68 61C70 71 81 84 88.5 92C92.5 96.5 90.5 100 85 100L63 100C59.5 100 57.5 98 56.5 95C55 89 53 82 50 82C47 82 45 89 43.5 95C42.5 98 40.5 100 37 100L15 100C9.5 100 7.5 96.5 11.5 92C19 84 30 71 32 61C27 58 18 58.5 10 56C0 53 0 41 9 36C20 30 40 27 50 27Z"/>
+    </g>
+  </g>
+</svg>

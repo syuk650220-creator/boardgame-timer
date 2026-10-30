@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>ボドゲタイマー</title>
+  <meta name="description" content="ボードゲームの「考える時間」に制限をかけるタイマー">
+  <meta name="theme-color" content="#0b0f14">
+  <meta name="color-scheme" content="dark">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="ボドゲタイマー">
+  <meta name="format-detection" content="telephone=no">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <link rel="stylesheet" href="css/style.css">
+  <script src="js/util.js" defer></script>
+  <script src="js/settings.js" defer></script>
+  <script src="js/sound.js" defer></script>
+  <script src="js/timer.js" defer></script>
+  <script src="js/picker.js" defer></script>
+  <script src="js/device.js" defer></script>
+  <script src="js/app.js" defer></script>
+</head>
+<body>
+  <!-- アイコン集（<use href="#i-xxx"> で呼び出す） -->
+  <svg class="sprite" aria-hidden="true" focusable="false">
+    <symbol id="i-sound" viewBox="0 0 24 24"><path d="M4 9.5h3.2L12 5.6v12.8l-4.8-3.9H4z"/><path d="M15.6 9a4.2 4.2 0 0 1 0 6"/><path d="M18.4 6.4a8 8 0 0 1 0 11.2"/></symbol>
+    <symbol id="i-light" viewBox="0 0 24 24"><path d="M9.2 17.6h5.6"/><path d="M10.2 20.6h3.6"/><path d="M12 3.4a5.8 5.8 0 0 0-3.4 10.5c.6.5.9 1.1.9 1.8v.3h5v-.3c0-.7.3-1.3.9-1.8A5.8 5.8 0 0 0 12 3.4z"/></symbol>
+    <symbol id="i-play" viewBox="0 0 24 24"><path class="fill" d="M8 5.8v12.4a.8.8 0 0 0 1.2.7l9.7-6.2a.8.8 0 0 0 0-1.4L9.2 5.1A.8.8 0 0 0 8 5.8z"/></symbol>
+    <symbol id="i-reset" viewBox="0 0 24 24"><path d="M4.6 12a7.4 7.4 0 1 0 2.2-5.3"/><path d="M4.6 4.4v4.2h4.2"/></symbol>
+    <symbol id="i-back" viewBox="0 0 24 24"><path d="M14.5 5.5 8 12l6.5 6.5"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5.5v13M5.5 12h13"/></symbol>
+    <symbol id="i-vol-low" viewBox="0 0 24 24"><path d="M6 9.5h3l4.5-3.6v12.2L9 14.5H6z"/></symbol>
+    <symbol id="i-vol-high" viewBox="0 0 24 24"><path d="M3.5 9.5h3L11 5.9v12.2l-4.5-3.6h-3z"/><path d="M14.6 9.2a4 4 0 0 1 0 5.6"/><path d="M17.3 6.6a7.7 7.7 0 0 1 0 10.8"/></symbol>
+    <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.6"/><path d="M12 3v1.8M12 19.2V21M3 12h1.8M19.2 12H21M5.6 5.6l1.3 1.3M17.1 17.1l1.3 1.3M5.6 18.4l1.3-1.3M17.1 6.9l1.3-1.3"/></symbol>
+    <symbol id="i-warn" viewBox="0 0 24 24"><path d="M10.3 4.6 2.9 17.4A2 2 0 0 0 4.6 20.4h14.8a2 2 0 0 0 1.7-3L13.7 4.6a2 2 0 0 0-3.4 0z"/><path d="M12 9.6v4.2"/><path d="M12 17v.1"/></symbol>
+    <symbol id="i-close" viewBox="0 0 24 24"><path d="m6.5 6.5 11 11M17.5 6.5l-11 11"/></symbol>
+    <symbol id="i-share" viewBox="0 0 24 24"><path d="M12 3.5v11"/><path d="M8.2 7.2 12 3.5l3.8 3.7"/><path d="M8.2 10.5H6.6A1.6 1.6 0 0 0 5 12.1v6.8a1.6 1.6 0 0 0 1.6 1.6h10.8a1.6 1.6 0 0 0 1.6-1.6v-6.8a1.6 1.6 0 0 0-1.6-1.6h-1.6"/></symbol>
+    <symbol id="i-bell" viewBox="0 0 24 24"><path d="M6 16.4V11a6 6 0 0 1 12 0v5.4l1.6 2.1H4.4z"/><path d="M10 20.6a2.1 2.1 0 0 0 4 0"/></symbol>
+    <symbol id="i-stop" viewBox="0 0 24 24"><rect class="fill" x="6.5" y="6.5" width="11" height="11" rx="2"/></symbol>
+  </svg>
+
+  <div class="app" id="app">
+
+    <!-- ===================== メインメニュー ===================== -->
+    <section class="screen screen-menu is-active" id="screen-menu" aria-labelledby="menu-title">
+      <header class="menu-header">
+        <img class="brand-icon" src="icons/icon.svg" alt="" width="42" height="42">
+        <div class="brand-text">
+          <h1 class="brand-title" id="menu-title">ボドゲタイマー</h1>
+          <p class="brand-sub">考える時間に、制限を。</p>
+        </div>
+      </header>
+
+      <div class="menu-scroll" id="menu-scroll">
+
+        <!-- 制限時間 -->
+        <section class="card" aria-labelledby="h-time">
+          <h2 class="card-title" id="h-time">制限時間</h2>
+          <div class="time-picker">
+            <div class="wheel" id="wheel-min"></div>
+            <span class="wheel-unit">分</span>
+            <div class="wheel" id="wheel-sec"></div>
+            <span class="wheel-unit">秒</span>
+          </div>
+          <div class="presets" id="presets" aria-label="よく使う時間"></div>
+          <p class="hint">「追加」で今の時間を登録 ・ 長押しで削除</p>
+        </section>
+
+        <!-- 時間切れのお知らせ -->
+        <section class="card" aria-labelledby="h-alert">
+          <h2 class="card-title" id="h-alert">時間切れのお知らせ</h2>
+
+          <div class="segmented" role="radiogroup" aria-label="お知らせ方法">
+            <label><input type="radio" name="alertMode" value="sound"><span><svg class="icon"><use href="#i-sound"/></svg>音</span></label>
+            <label><input type="radio" name="alertMode" value="light"><span><svg class="icon"><use href="#i-light"/></svg>光</span></label>
+            <label><input type="radio" name="alertMode" value="both"><span><svg class="icon"><use href="#i-sound"/></svg><svg class="icon icon-tight"><use href="#i-light"/></svg>音＋光</span></label>
+          </div>
+
+          <div class="field" data-requires="sound">
+            <div class="field-label">音の種類 <span class="field-note">タップで試聴</span></div>
+            <div class="sound-grid" id="sound-grid" role="radiogroup" aria-label="音の種類"></div>
+          </div>
+
+          <div class="field" data-requires="sound">
+            <div class="field-label">音量</div>
+            <div class="volume-row">
+              <svg class="icon"><use href="#i-vol-low"/></svg>
+              <input type="range" id="volume" min="0" max="100" step="1" aria-label="音量">
+              <svg class="icon"><use href="#i-vol-high"/></svg>
+            </div>
+          </div>
+
+          <div class="field" data-requires="light">
+            <div class="field-label">光の色 <span class="field-note">画面全体が点滅します</span></div>
+            <div class="swatches" id="swatches" role="radiogroup" aria-label="光の色"></div>
+          </div>
+
+          <div class="field">
+            <div class="field-label">知らせる長さ</div>
+            <div class="segmented" role="radiogroup" aria-label="知らせる長さ">
+              <label><input type="radio" name="alertLength" value="3"><span>3秒</span></label>
+              <label><input type="radio" name="alertLength" value="5"><span>5秒</span></label>
+              <label><input type="radio" name="alertLength" value="10"><span>10秒</span></label>
+              <label><input type="radio" name="alertLength" value="0"><span>止めるまで</span></label>
+            </div>
+          </div>
+
+          <button type="button" class="btn btn-secondary btn-block" id="btn-test">
+            <svg class="icon"><use href="#i-bell"/></svg><span id="btn-test-label">お知らせをテスト</span>
+          </button>
+        </section>
+
+        <!-- オプション -->
+        <section class="card" aria-labelledby="h-opt">
+          <h2 class="card-title" id="h-opt">オプション</h2>
+
+          <div class="field field-first">
+            <div class="field-label">残り時間の予告</div>
+            <div class="segmented" role="radiogroup" aria-label="残り時間の予告">
+              <label><input type="radio" name="warnSec" value="0"><span>なし</span></label>
+              <label><input type="radio" name="warnSec" value="3"><span>3秒</span></label>
+              <label><input type="radio" name="warnSec" value="5"><span>5秒</span></label>
+              <label><input type="radio" name="warnSec" value="10"><span>10秒</span></label>
+            </div>
+            <p class="hint">残りがこの秒数になると、1秒ごとに「ピッ」と鳴り、画面のふちが赤く光ります。</p>
+          </div>
+
+          <label class="switch-row">
+            <span class="switch-text">
+              <span class="switch-title">マナーモードでも鳴らす</span>
+              <span class="switch-desc">iPhoneが消音中でも音を出します。オンの間は、他のアプリの音楽が止まることがあります。</span>
+            </span>
+            <input type="checkbox" class="switch" id="opt-silent">
+          </label>
+
+          <label class="switch-row">
+            <span class="switch-text">
+              <span class="switch-title">ボタンを押したときに振動</span>
+              <span class="switch-desc">対応するiPhone（iOS 18以降）で軽く振動します。</span>
+            </span>
+            <input type="checkbox" class="switch" id="opt-haptics">
+          </label>
+        </section>
+
+        <!-- ホーム画面に追加のヒント（iPhoneのSafariで開いたときだけ表示） -->
+        <aside class="tip" id="install-tip" hidden>
+          <svg class="icon tip-icon"><use href="#i-share"/></svg>
+          <p>Safariの<strong>共有ボタン</strong>から<strong>「ホーム画面に追加」</strong>すると、アプリのように全画面で使えます。</p>
+          <button type="button" class="icon-btn" id="install-tip-close" aria-label="閉じる"><svg class="icon"><use href="#i-close"/></svg></button>
+        </aside>
+
+        <p class="menu-credit">設定はこの端末に自動で保存されます</p>
+      </div>
+
+      <footer class="menu-footer">
+        <button type="button" class="btn btn-primary btn-go" id="btn-go">
+          <span class="btn-go-main">タイマーをセット</span>
+          <span class="btn-go-sub" id="go-summary"></span>
+        </button>
+      </footer>
+    </section>
+
+    <!-- ===================== タイマー画面 ===================== -->
+    <section class="screen screen-timer" id="screen-timer" aria-label="タイマー" data-state="ready" data-level="">
+      <header class="timer-header">
+        <button type="button" class="btn-back" id="btn-back">
+          <svg class="icon"><use href="#i-back"/></svg><span>メニュー</span>
+        </button>
+        <div class="timer-meta">
+          <span>制限時間</span>
+          <strong id="meta-duration">1:00</strong>
+        </div>
+        <div class="timer-modes" id="meta-modes"></div>
+      </header>
+
+      <div class="notice" id="wake-notice" hidden>
+        <svg class="icon notice-icon"><use href="#i-warn"/></svg>
+        <p id="wake-notice-text"></p>
+        <button type="button" class="icon-btn" id="wake-notice-close" aria-label="閉じる"><svg class="icon"><use href="#i-close"/></svg></button>
+      </div>
+
+      <!-- アプリの切り替えなどで音が止まってしまったとき（タップで復帰。タイマーはそのまま） -->
+      <button type="button" class="notice notice-audio" id="audio-notice" hidden>
+        <svg class="icon notice-icon"><use href="#i-sound"/></svg>
+        <span class="notice-text">音が止まっています。<strong>ここをタップ</strong>すると時間切れの音が鳴るように戻ります（タイマーはそのまま）。</span>
+      </button>
+
+      <div class="dial-area">
+        <button type="button" class="dial" id="dial" aria-describedby="timer-foot">
+          <svg class="dial-ring" viewBox="0 0 240 240" aria-hidden="true">
+            <circle class="ring-track" cx="120" cy="120" r="108"/>
+            <circle class="ring-progress" id="ring-progress" cx="120" cy="120" r="108" transform="rotate(-90 120 120)"/>
+            <g id="ring-knob"><circle class="ring-knob" cx="120" cy="12" r="5.2"/></g>
+          </svg>
+          <span class="dial-face">
+            <span class="dial-label" id="dial-label">READY</span>
+            <span class="dial-time" id="dial-time">1:00</span>
+            <span class="dial-sub" id="dial-sub"></span>
+          </span>
+        </button>
+      </div>
+
+      <p class="timer-foot" id="timer-foot"></p>
+      <div class="vignette" id="vignette" aria-hidden="true"></div>
+    </section>
+
+    <!-- 時間切れの光（画面全体が点滅） -->
+    <div class="flash" id="flash" hidden>
+      <div class="flash-inner">
+        <div class="flash-title" id="flash-title">TIME UP</div>
+        <div class="flash-sub" id="flash-sub">時間切れ</div>
+        <div class="flash-hint" id="flash-hint">タップでリセット</div>
+      </div>
+    </div>
+
+    <!-- 確認ダイアログ -->
+    <div class="sheet-backdrop" id="sheet" hidden>
+      <div class="sheet" role="alertdialog" aria-modal="true" aria-labelledby="sheet-title" aria-describedby="sheet-msg">
+        <h3 class="sheet-title" id="sheet-title"></h3>
+        <p class="sheet-msg" id="sheet-msg"></p>
+        <div class="sheet-actions">
+          <button type="button" class="btn btn-secondary" id="sheet-cancel">キャンセル</button>
+          <button type="button" class="btn btn-primary" id="sheet-ok">OK</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    <div class="sr-only" id="sr-live" aria-live="assertive"></div>
+  </div>
+</body>
+</html>

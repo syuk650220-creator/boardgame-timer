@@ -1,0 +1,7 @@
+# 依存パッケージ（このアプリでは使っていませんが念のため）
+node_modules/
+
+# Windows / OneDrive が自動で作るファイル
+desktop.ini
+Thumbs.db
+*.tmp
